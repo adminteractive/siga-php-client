@@ -2,9 +2,9 @@
 
 namespace SigaClient\Exception;
 
-abstract class SigaException extends \RuntimeException
+class SigaException extends \RuntimeException
 {
-    
+
     /**
      * @param string $message
      * @param integer $code

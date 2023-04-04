@@ -12,7 +12,7 @@ class HashcodeContainer
      * @var string
      */
     private $filename;
-    
+
     /**
      * Container data.
      *
@@ -32,15 +32,13 @@ class HashcodeContainer
      *
      * @param string $filename Filename with full path
      *
-     * @return HashcodeContainer
+     * @return void
      */
     public function __construct(string $filename)
     {
         $this->filename = $filename;
-        
-        return $this;
     }
-    
+
     /**
      * Register hashcode container
      *
@@ -54,7 +52,7 @@ class HashcodeContainer
 
         return $this;
     }
-    
+
     /**
      * Checks if given container is hashcode container or not
      *
@@ -64,14 +62,14 @@ class HashcodeContainer
     {
         $zip = new \ZipArchive();
         $zip->open($this->filename);
-        
+
         $isHashcode = $zip->locateName('META-INF/hashcodes-sha256.xml') !== false;
-        
+
         $zip->close();
 
         return $isHashcode;
     }
-    
+
     /**
      * Get hashcode container without data files
      *
@@ -90,10 +88,10 @@ class HashcodeContainer
         }
 
         $zip->close();
-        
+
         return file_get_contents($tempZipFile);
     }
-    
+
     /**
      * Get container datafiles list
      *
@@ -115,10 +113,10 @@ class HashcodeContainer
     {
         $zip = new \ZipArchive();
         $zip->open($this->filename);
-        
+
         for ($i = 0; $i < $zip->numFiles; $i++) {
             $filename = $zip->getNameIndex($i);
-            
+
             if ($this->isDataFile($filename)) {
                 $stat = $zip->statName($filename);
 
@@ -142,7 +140,7 @@ class HashcodeContainer
     {
         return $filename !== 'mimetype' && strpos($filename, 'META-INF/') !== 0;
     }
-    
+
     /**
      * Extract data files from container
      *
@@ -153,7 +151,7 @@ class HashcodeContainer
     public function extractDataFiles(string $outputDir) : array
     {
         $datafiles = [];
-        
+
         if (!is_dir($outputDir)) {
             return $datafiles;
         }
@@ -163,12 +161,12 @@ class HashcodeContainer
 
         for ($i = 0; $i < $zip->numFiles; $i++) {
             $filename = $zip->getNameIndex($i);
-            
+
             if ($this->isDataFile($filename)) {
                 $stat = $zip->statName($filename);
 
                 $file = new HashcodeDataFile($filename, $stat['size'], $zip->getFromName($filename));
-                
+
                 if ($zip->extractTo($outputDir)) {
                     $datafiles[] = $outputDir . DIRECTORY_SEPARATOR . $file->getName();
                 }
@@ -178,7 +176,7 @@ class HashcodeContainer
 
         return $datafiles;
     }
-    
+
     /**
      * Add files to container
      *
@@ -210,7 +208,7 @@ class HashcodeContainer
 
         return $this;
     }
-    
+
     /**
      * Get files
      *
@@ -301,11 +299,11 @@ class HashcodeContainer
 
         $zip = new \ZipArchive();
         $zip->open($this->filename);
-        
+
         foreach ($this->files as $hashcodeFile) {
             $zip->addFromString($hashcodeFile->getName(), $hashcodeFile->getContent());
         }
-        
+
         $zip->deleteName('META-INF/hashcodes-sha256.xml');
         $zip->deleteName('META-INF/hashcodes-sha512.xml');
 
@@ -317,7 +315,7 @@ class HashcodeContainer
 
         return $return;
     }
-    
+
     /**
      * Convert datafile container to hashcode container
      *
